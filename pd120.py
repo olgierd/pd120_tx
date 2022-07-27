@@ -5,6 +5,13 @@ from PIL import Image
 from math import pi, sin
 import numpy as np
 
+"""
+Only resources used when developing this code:
+- https://www.sstv-handbook.com/download/sstv-handbook.pdf
+- http://www.barberdsp.com/downloads/Dayton%20Paper.pdf
+- https://www.classicsstv.com/pdmodes.php
+"""
+
 INPUT_JPG = "a.jpg"
 OUTPUT_WAV = "out.wav"
 
@@ -14,23 +21,21 @@ px = im.load()
 w, h = im.size
 
 # prepare oscillator
-sr = 5263   # sample rate
+sr = 5263   # sample rate, 5263 because single pixel in PD120 should last for 0.19 ms == 1 sample @ 5263 Hz
 q = pi/sr*2  # for conversion frequency -> radians/sample
-osc = 0
+osc = 0     # position (angle) of IQ oscillator, keeping angle only since ampl == const == 1
 
 # container for the whole image
 out = []
 
 # for every other line
 for l in range(0, h-1, 2):
+    # PD-120 transmits ... two lines as a single line
     line = [px[x, l] for x in range(w)] # get all pixels in line l
     line1 = [px[x, l+1] for x in range(w)] # .. and l+1
     
-    # generate sync pulse - 1200 Hz for 20 ms
-    out += [1200] * round(sr*0.02)
-    
-    # generate porch - 1500 Hz for 2.08 mS
-    out += [1500] * round(sr*0.0021)
+    # generate sync pulse - 1200 Hz for 20 ms, and black stripe - 1500 Hz for 2.08 mS
+    out += [1200] * round(sr*0.02) + [1500] * round(sr*0.00208)
     
     # generate line data, Y for line 0, average of R-Y and B-Y, Y for line 1 
     Y0, RY0, BY0, Y1 = [], [], [], []
