@@ -20,7 +20,7 @@ for l in range(120): # for every line in image
     
     for R, G, B in [px[x, l] for x in range(160)]:    # for every pixel
         inst_freq = 1500 + (((R+G+B)/3 * 800/255))    # convert average value of R,G,B into frequency
-        out = np.append(out, [inst_freq]*3)           # and store it in output list (*5, because we use 5 samples per pixel)
+        out = np.append(out, [inst_freq]*3)           # and store it in output list (*3, because we use 3 samples per pixel)
     
 for freq in out:
     osc = (osc + 2*freq*pi/sr) % (2*pi) # rotate the IQ oscillator
